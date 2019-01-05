@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Requests\Auth\RegisterRequest;
 use App\Mail\Auth\VerifyMail;
 use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class RegisterController extends Controller
@@ -22,25 +23,12 @@ class RegisterController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    protected function validator(Request $request)
-    {
-        $this->validate($request, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:6', 'confirmed'],
-        ]);
-    }
-
-    /**
      * Create a new user instance after a valid registration.
      *
-     * @param Request $request
+     * @param RegisterRequest $request
      * @return mixed
      */
-    protected function register(Request $request)
+    protected function register(RegisterRequest $request)
     {
         $user = User::create([
             'name' => $request['name'],
@@ -50,7 +38,7 @@ class RegisterController extends Controller
             'status' => User::STATUS_WAIT
         ]);
 
-        \Mail::to($user->email)->send(new VerifyMail($user));
+        Mail::to($user->email)->send(new VerifyMail($user));
         event(new Registered($user));
 
         return redirect()->route('login')->with('success', 'Your email is verified. You can now login.');
