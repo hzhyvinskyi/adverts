@@ -3,29 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\User;
+use Illuminate\Foundation\Auth\ThrottlesLogins;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
-    use AuthenticatesUsers;
-
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/cabinet';
+    use ThrottlesLogins;
 
     /**
      * Create a new controller instance.
@@ -35,5 +20,55 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    public function showLoginForm()
+    {
+        return view('auth.login');
+    }
+
+    public function login(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required|string',
+            'password' => 'required|string'
+        ]);
+
+        if ($this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
+            $this->sendLockoutResponse($request);
+        }
+
+        $authenticate = auth()->attempt(
+            $request->only(['email', 'password']),
+            $request->filled('remember')
+        );
+
+        if ($authenticate) {
+            $request->session()->regenerate();
+            $this->clearLoginAttempts($request);
+            $user = auth()->user();
+            if ($user->status !== User::STATUS_ACTIVE) {
+                auth()->logout();
+                return back()->with('error', 'You need to confirm your account. Please check your email.');
+            }
+            return redirect()->intended(route('cabinet'));
+        }
+
+        $this->incrementLoginAttempts($request);
+
+        throw ValidationException::withMessages(['email' => [trans('auth.failed')]]);
+    }
+
+    public function logout(Request $request)
+    {
+        auth()->logout();
+        $request->session()->invalidate();
+        return redirect()->route('home');
+    }
+
+    protected function username()
+    {
+        return 'email';
     }
 }

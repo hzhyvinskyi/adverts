@@ -15,4 +15,6 @@ Route::get('/', 'HomeController@index')->name('home');
 
 Auth::routes();
 
-Route::get('/cabinet', 'Cabinet\HomeController@index')->name('cabinet');
+Route::get('verify/{token}', 'Auth\VerificationController@verify')->name('verify');
+
+Route::get('cabinet', 'Cabinet\HomeController@index')->name('cabinet');

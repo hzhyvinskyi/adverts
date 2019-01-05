@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\User;
 use Illuminate\Foundation\Auth\VerifiesEmails;
+use Illuminate\Http\Request;
 
 class VerificationController extends Controller
 {
@@ -37,5 +39,22 @@ class VerificationController extends Controller
         $this->middleware('auth');
         $this->middleware('signed')->only('verify');
         $this->middleware('throttle:6,1')->only('verify', 'resend');
+    }
+
+    public function verify($token)
+    {
+        if (! $user = User::where('verify_token', $token)->first()) {
+            return redirect()->route('login')->with('error', 'Sorry your link cannot be identified.');
+        }
+
+        if ($user->status !== User::STATUS_WAIT) {
+            return redirect()->route('login')->with('error', 'Your email is already verified.');
+        }
+
+        $user->status = User::STATUS_ACTIVE;
+        $user->verify_token = null;
+        $user->save();
+
+        return redirect()->route('login')->with('success', 'Your email is verified. You can now login.');
     }
 }
