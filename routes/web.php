@@ -18,3 +18,7 @@ Auth::routes();
 Route::get('verify/{token}', 'Auth\VerificationController@verify')->name('verify');
 
 Route::get('cabinet', 'Cabinet\HomeController@index')->name('cabinet');
+
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'middleware' => 'auth'], function () {
+    Route::get('/', 'HomeController@index')->name('home');
+});
