@@ -26,9 +26,9 @@
             <tr>
                 <th>Status</th>
                 <td>
-                    @if ($user->status == \App\Entities\User::STATUS_WAIT)
+                    @if ($user->isWait())
                         <span class="badge badge-secondary">Waiting</span>
-                    @elseif ($user->status = \App\Entities\User::STATUS_ACTIVE)
+                    @elseif ($user->isActive())
                         <span class="badge badge-primary">Active</span>
                     @endif
                 </td>

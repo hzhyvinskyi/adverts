@@ -19,9 +19,9 @@
                     <td><a href="{{ route('admin.users.show', $user) }}">{{ $user->name }}</a></td>
                     <td>{{ $user->email }}</td>
                     <td>
-                        @if ($user->status == \App\Entities\User::STATUS_WAIT)
+                        @if ($user->isWait())
                             <span class="badge badge-secondary">Waiting</span>
-                        @elseif ($user->status == \App\Entities\User::STATUS_ACTIVE)
+                        @elseif ($user->isActive())
                             <span class="badge badge-primary">Active</span>
                         @endif
                     </td>
