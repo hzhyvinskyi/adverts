@@ -50,10 +50,10 @@ Breadcrumbs::register('admin.users.create', function (BreadcrumbsGenerator $crum
 
 Breadcrumbs::register('admin.users.show', function (BreadcrumbsGenerator $crumb, User $user) {
     $crumb->parent('admin.users.index');
-    $crumb->push($user->name, route('admin.users.show'));
+    $crumb->push($user->name, route('admin.users.show', $user));
 });
 
 Breadcrumbs::register('admin.users.edit', function (BreadcrumbsGenerator $crumb, User $user) {
     $crumb->parent('admin.users.show', $user);
-    $crumb->push('Edit', route('admin.users.edit'));
+    $crumb->push('Edit', route('admin.users.edit', $user));
 });

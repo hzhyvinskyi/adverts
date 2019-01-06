@@ -40,13 +40,15 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
+        $data = $this->validate($request, [
             'name' => 'required|string|max:50',
             'email' => 'required|string|email|max:50|unique:users',
-            'status' => User::STATUS_ACTIVE
         ]);
 
-        $user = User::create($request->only(['name', 'email', 'status']));
+        $data['password'] = bcrypt(str_random());
+        $data['status'] = User::STATUS_ACTIVE;
+
+        $user = User::create($data);
 
         return redirect()->route('admin.users.show', $user);
     }
@@ -90,13 +92,13 @@ class UsersController extends Controller
     {
         $data = $this->validate($request, [
             'name' => 'required|string|max:50',
-            'email' => 'required|string|email|max:50|unique:users,id' . $user->id,
+            'email' => 'required|string|email|max:50|unique:users,id,' . $user->id,
             'status' => ['required', 'string', Rule::in([User::STATUS_WAIT, User::STATUS_ACTIVE])]
         ]);
 
         $user->update($data);
 
-        return redirect()->route('admin.users.show.user', $user);
+        return redirect()->route('admin.users.show', $user);
     }
 
     /**

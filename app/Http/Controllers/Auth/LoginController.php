@@ -23,16 +23,31 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
+    /**
+     * Show the application's login form.
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
-    public function login(LoginRequest $request)
+    /**
+     * Handle a login request to the application.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|void
+     * @throws ValidationException
+     */
+    public function login(Request $request)
     {
+        $this->validateLogin($request);
+
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
-            $this->sendLockoutResponse($request);
+
+            return $this->sendLockoutResponse($request);
         }
 
         $authenticate = auth()->attempt(
@@ -53,7 +68,9 @@ class LoginController extends Controller
 
         $this->incrementLoginAttempts($request);
 
-        throw ValidationException::withMessages(['email' => [trans('auth.failed')]]);
+        throw ValidationException::withMessages([
+            $this->username() => [trans('auth.failed')],
+        ]);
     }
 
     public function logout(Request $request)
@@ -61,6 +78,19 @@ class LoginController extends Controller
         auth()->logout();
         $request->session()->invalidate();
         return redirect()->route('home');
+    }
+
+    /**
+     * Validate the user login request.
+     *
+     * @param Request $request
+     */
+    protected function validateLogin(Request $request)
+    {
+        $request->validate([
+            $this->username() => 'required|string',
+            'password' => 'required|string',
+        ]);
     }
 
     protected function username()
