@@ -39,10 +39,10 @@ class UsersController extends Controller
      */
     public function store(CreateRequest $request)
     {
-        $user = User::create($request->only(['name', 'email']) + [
-            $data['password'] = bcrypt(str_random()),
-            $data['status'] = User::STATUS_ACTIVE
-        ]);
+        $user = User::new(
+            $request['name'],
+            $request['email']
+        );
 
         return redirect()->route('admin.users.show', $user);
     }

@@ -8,7 +8,6 @@ use App\Entities\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
@@ -35,13 +34,11 @@ class RegisterController extends Controller
      */
     protected function register(RegisterRequest $request)
     {
-        $user = User::create([
-            'name' => $request['name'],
-            'email' => $request['email'],
-            'password' => bcrypt($request['password']),
-            'verify_token' => Str::random(),
-            'status' => User::STATUS_WAIT
-        ]);
+        $user = User::register(
+            $request['name'],
+            $request['email'],
+            $request['password']
+        );
 
         Mail::to($user->email)->send(new VerifyMail($user));
         event(new Registered($user));

@@ -46,14 +46,12 @@ class VerificationController extends Controller
             return redirect()->route('login')->with('error', 'Sorry your link cannot be identified.');
         }
 
-        if ($user->status !== User::STATUS_WAIT) {
-            return redirect()->route('login')->with('error', 'Your email is already verified.');
+        try {
+            $user->verify();
+            return redirect()->route('login')->with('success', 'Your email is verified. You can now login.');
+        } catch (\DomainException $e) {
+            return redirect()->route('login')->with('error', $e->getMessage());
         }
 
-        $user->status = User::STATUS_ACTIVE;
-        $user->verify_token = null;
-        $user->save();
-
-        return redirect()->route('login')->with('success', 'Your email is verified. You can now login.');
     }
 }
