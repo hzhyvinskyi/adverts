@@ -5,6 +5,10 @@
 
     <div class="d-flex flex-row mb-3">
         <a class="btn btn-primary mr-1" href="{{ route('admin.users.edit', $user) }}">Edit</a>
+        <form class="mr-1" action="{{ route('admin.users.verify', $user) }}" method="POST">
+            @csrf
+            <button class="btn btn-danger">Verify</button>
+        </form>
         <form class="mr-1" action="{{ route('admin.users.destroy', $user) }}" method="POST">
             @csrf
             @method('DELETE')

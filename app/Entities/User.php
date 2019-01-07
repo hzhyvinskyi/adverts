@@ -48,7 +48,7 @@ class User extends Authenticatable
         ]);
     }
 
-    public static function new($name, $email): self
+    public static function new(string $name, string $email): self
     {
         return static::create([
             'name' => $name,

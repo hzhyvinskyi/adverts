@@ -66,12 +66,7 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
-        $statuses = [
-            User::STATUS_WAIT => 'Waiting',
-            User::STATUS_ACTIVE => 'Active'
-        ];
-
-        return view('admin.users.edit', compact('user', 'statuses'));
+        return view('admin.users.edit', compact('user'));
     }
 
     /**
@@ -100,5 +95,20 @@ class UsersController extends Controller
         $user->delete();
 
         return redirect()->route('admin.users.index');
+    }
+
+    /**
+     * @param User $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function verify(User $user)
+    {
+        try {
+            $user->verify();
+        } catch (\DomainException $e) {
+            return redirect()->route('admin.users.show', $user)->with('error', $e->getMessage());
+        }
+
+        return redirect()->route('admin.users.show', $user);
     }
 }
