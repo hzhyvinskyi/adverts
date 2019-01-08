@@ -5,10 +5,20 @@ namespace App\UseCases\Auth;
 use App\Entities\User;
 use App\Mail\Auth\VerifyMail;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Mail\Mailer;
 
 class RegisterService
 {
+    private $mailer;
+    private $dispatcher;
+
+    public function __construct(Mailer $mailer, Dispatcher $dispatcher)
+    {
+        $this->mailer = $mailer;
+        $this->dispatcher = $dispatcher;
+    }
+
     public function register(array $data): void
     {
         $user = User::register(
@@ -17,7 +27,7 @@ class RegisterService
             $data['password']
         );
 
-        Mail::to($user->email)->send(new VerifyMail($user));
-        event(new Registered($user));
+        $this->mailer->to($user->email)->send(new VerifyMail($user));
+        $this->dispatcher->dispatch(new Registered($user));
     }
 }
