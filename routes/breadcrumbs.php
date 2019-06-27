@@ -1,6 +1,6 @@
 <?php
 
-use App\Entities\User;
+use App\Entity\User;
 use DaveJamesMiller\Breadcrumbs\Facades\Breadcrumbs;
 use DaveJamesMiller\Breadcrumbs\BreadcrumbsGenerator;
 

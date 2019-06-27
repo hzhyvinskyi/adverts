@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Admin\Users;
 
-use App\Entities\User;
+use App\Entity\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**

@@ -2,7 +2,7 @@
 
 namespace App\UseCases\Auth;
 
-use App\Entities\User;
+use App\Entity\User;
 
 class VerificationService
 {
